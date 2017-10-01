@@ -44,7 +44,7 @@ def wikipedia_search(text):
             except:
                 logger.error(traceback.format_exc())
 
-        response_string = '説明します\n'
+        response_string = '説明しよう:triumph:\n'
         response_string += wiki_page.content[0:200] + '.....\n'
         response_string += wiki_page.url
     else:
