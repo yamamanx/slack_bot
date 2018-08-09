@@ -7,7 +7,7 @@ import traceback
 import json
 import os
 import util
-from doco.client import Client
+from datetime import datetime
 
 
 logger = logging.getLogger()
@@ -15,14 +15,33 @@ logger.setLevel(util.logger_level())
 
 
 def docomo_response(text):
-    docomo_client = Client(
-        apikey=os.environ['DOCOMO_API_KEY']
+    docomo_app_id = os.environ.get('DOCOMO_APP_ID', '')
+    docomo_api_key = os.environ.get('DOCOMO_API_KEY', '')
+    docomo_endpoint = 'https://api.apigw.smt.docomo.ne.jp/naturalChatting/v1/dialogue?APIKEY={api_key}'.format(
+        api_key=docomo_api_key
     )
-    response = docomo_client.send(utt=text, apiname='Dialogue')
 
-    logger.debug(response)
+    headers = {
+        'Content-type': 'application/json;charset=UTF-8'
+    }
 
-    return response['utt']
+    payload = {
+        "language": "ja-JP",
+        "botId": "Chatting",
+        "appId": docomo_app_id,
+        "voiceText": text,
+        "appRecvTime": "2018-08-02 22:44:22",
+        "appSendTime": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    response = requests.post(
+        docomo_endpoint,
+        data=json.dumps(payload),
+        headers=headers
+    )
+
+    data = response.json()
+    return data['systemText']['expression']
 
 
 def wikipedia_search(text):
